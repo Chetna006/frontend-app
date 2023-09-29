@@ -1,0 +1,140 @@
+npx create-react-app profile-explorer
+cd profile-explorer
+src/
+|-- components/
+|   |-- ProfileList.js
+|   |-- ProfileCard.js
+|   |-- Map.js
+|   |-- ProfileDetails.js
+|-- App.js
+|-- App.css
+|-- ...
+
+// profileData.js
+const profiles = [
+  {
+    id: 1,
+    name: "John Doe",
+    description: "Web Developer",
+    address: "123 Main St, City, Country",
+    // Other profile data
+  },
+  // More profiles
+];
+
+export default profiles;
+
+
+// App.js
+import React, { useState, useEffect } from "react";
+import ProfileList from "./components/ProfileList";
+
+function App() {
+  const [profiles, setProfiles] = useState([]);
+
+  useEffect(() => {
+    // Fetch profile data from an API or a local JSON file
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/profiles"); // Replace with your API endpoint
+        const data = await response.json();
+        setProfiles(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Profile Explorer</h1>
+      <ProfileList profiles={profiles} />
+    </div>
+  );
+}
+
+export default App;
+
+// components/ProfileList.js
+import React from "react";
+import ProfileCard from "./ProfileCard";
+
+function ProfileList({ profiles }) {
+  return (
+    <div className="profile-list">
+      {profiles.map((profile) => (
+        <ProfileCard key={profile.id} profile={profile} />
+      ))}
+    </div>
+  );
+}
+
+export default ProfileList;
+
+// components/ProfileList.js
+import React from "react";
+import ProfileCard from "./ProfileCard";
+
+function ProfileList({ profiles }) {
+  return (
+    <div className="profile-list">
+      {profiles.map((profile) => (
+        <ProfileCard key={profile.id} profile={profile} />
+      ))}
+    </div>
+  );
+  // components/Map.js
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+function Map({ profile }) {
+  return (
+    <div className="map-container">
+      <MapContainer
+        center={[profile.latitude, profile.longitude]} // Replace with actual coordinates
+        zoom={13}
+        style={{ height: "400px" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <Marker position={[profile.latitude, profile.longitude]}>
+          <Popup>{profile.name}</Popup>
+        </Marker>
+      </MapContainer>
+    </div>
+  );
+}
+
+export default Map;
+
+}
+
+export default ProfileList;
+
+// components/ProfileCard.js (updated)
+import React, { useState } from "react";
+import Map from "./Map";
+
+function ProfileCard({ profile }) {
+  const [showMap, setShowMap] = useState(false);
+
+  return (
+    <div className="profile-card">
+      <img src={profile.photo} alt={profile.name} />
+      <h2>{profile.name}</h2>
+      <p>{profile.description}</p>
+      <button onClick={() => setShowMap(!showMap)}>
+        {showMap ? "Hide Map" : "Show on Map"}
+      </button>
+      {showMap && <Map profile={profile} />}
+    </div>
+  );
+}
+
+export default ProfileCard;
+
+
